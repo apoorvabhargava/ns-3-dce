@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
  * Author: Sourabh Jain <sourabhjain560@outlook.com>
+ *         Apoorva Bhargava <apoorvabhargava13@gmail.com>
  *         Mohit P. Tahiliani <tahiliani@nitk.edu.in>
  */
 #include <iostream>
@@ -44,31 +45,38 @@ tracer (uint32_t oldval, uint32_t newval)
 static void
 cwnd (std::string file_name)
 {
-  std::cout << "cwnd" << std::endl;
   AsciiTraceHelper ascii;
   cWndStream = ascii.CreateFileStream (file_name.c_str ());
   Config::ConnectWithoutContext ("/NodeList/0/$ns3::TcpL4Protocol/SocketList/0/CongestionWindow", MakeCallback (&tracer));
 }
 
+static void GetSSStats (Ptr<Node> node, Time at, std::string stack)
+{
+  if(stack == "linux")
+  {
+    DceApplicationHelper process;
+    ApplicationContainer apps;
+    process.SetBinary ("ss");
+    process.SetStackSize (1 << 20);
+    process.AddArgument ("-a");
+    process.AddArgument ("-e");
+    process.AddArgument ("-i");
+    apps.Add(process.Install (node));
+    apps.Start(at);
+  }
+}
+
 
 int main (int argc, char *argv[])
 {
-
-  std::cout << "main" << std::endl;
   bool trace = true;
   bool pcap = false;
   double simulation_time = 10.0;
   std::string trace_file = "cwnd_trace_file.trace";
   std::string stack = "linux";
   unsigned int num_flows = 3;
-  double start_time = 0.1;
-  double stop_time = start_time + 10.0;
   std::string sock_factory = "ns3::TcpSocketFactory";
-  std::string stack = "ns3";
-  unsigned int num_flows = 3;
-  double start_time = 0.1;
-  double stop_time = start_time + 10.0;
-
+  float duration = 30;
 
   CommandLine cmd;
   cmd.AddValue ("trace", "Enable trace", trace);
@@ -76,6 +84,10 @@ int main (int argc, char *argv[])
   cmd.AddValue ("time", "Simulation Duration", simulation_time);
   cmd.AddValue ("stack", "Network stack: either ns3 or Linux", stack);
   cmd.Parse (argc, argv);
+
+  // Set the simulation start and stop time
+  float start_time = 10.1;
+  float stop_time = start_time + duration;
 
   if (stack != "ns3" && stack != "linux")
     {
@@ -105,7 +117,6 @@ int main (int argc, char *argv[])
       dceManager.SetNetworkStack ("ns3::LinuxSocketFdFactory",
                                   "Library", StringValue ("liblinux.so"));
       linuxStack.Install (nodes);
-      dceManager.Install (nodes);
     }
   else
     {
@@ -127,57 +138,31 @@ int main (int argc, char *argv[])
 
   if(stack == "linux")
     {
-      std::cout << "linux stack start" << std::endl;
       LinuxStackHelper::PopulateRoutingTables ();
-      //linuxStack.SysctlSet (nodes.Get (0), ".net.ipv4.conf.default.forwarding", "1");
-      //linuxStack.SysctlSet (nodes.Get (2), ".net.ipv4.conf.default.forwarding", "1");
-      //linuxStack.SysctlSet (nodes.Get (0), ".net.ipv4.tcp_congestion_control", "westwood");
-      //linuxStack.SysctlSet (nodes.Get (2), ".net.ipv4.tcp_congestion_control", "westwood");
-      //
-      //linuxStack.SysctlSet (nodes.Get (0), ".net.ipv4.tcp_sack", "0");
-      //linuxStack.SysctlSet (nodes.Get (0), ".net.ipv4.tcp_frto", "0");
-      //linuxStack.SysctlSet (nodes.Get (0), ".net.ipv4.tcp_dsack", "0");
-      //linuxStack.SysctlSet (nodes.Get (0), ".net.ipv4.tcp_ecn", "0");
-      //linuxStack.SysctlSet (nodes.Get (0), ".net.ipv4.tcp_fack", "0");
-      //linuxStack.SysctlSet (nodes.Get (0), ".net.core.wmem_max", "12582912");
-      //linuxStack.SysctlSet (nodes.Get (0), ".net.core.rmem_max", "12582912");
-      //linuxStack.SysctlSet (nodes.Get (0), ".net.ipv4.tcp_rmem", "10240 87380 12582912");
-      //linuxStack.SysctlSet (nodes.Get (0), ".net.ipv4.tcp_wmem", "10240 87380 12582912");
-
-      std::cout << "linux stack end" << std::endl;
+      dceManager.Install (nodes);
     }
 
   uint16_t port = 2000;
   Address sinkLocalAddress (InetSocketAddress (Ipv4Address::GetAny (), port));
 
   PacketSinkHelper sinkHelper (sock_factory, sinkLocalAddress);
-  std::cout << "packet sink helper" << std::endl;
   
   AddressValue remoteAddress (InetSocketAddress (sink_interfaces.GetAddress (0, 0), port));
-  std::cout << "remote address" << std::endl;
   BulkSendHelper sender (sock_factory, Address ());
-  std::cout << "bulk send" << std::endl;
     
   sender.SetAttribute ("Remote", remoteAddress);
   ApplicationContainer sendApp = sender.Install (nodes.Get (0));
-  sendApp.Start (Seconds(0.0));
-  sendApp.Stop (Seconds(10));
-  std::cout << "appplication end" << std::endl;
+  sendApp.Start (Seconds (start_time));
+  sendApp.Stop (Seconds (stop_time));
 
-
-  sinkHelper.SetAttribute ("Protocol", TypeIdValue (TcpSocketFactory::GetTypeId ()));
   ApplicationContainer sinkApp = sinkHelper.Install (nodes.Get (2));
-  sinkApp.Start (Seconds (0.0));
-  sinkApp.Stop (Seconds (12));
-
-  std::cout << "sink helper end" << std::endl;
+  sinkApp.Start (Seconds (start_time));
+  sinkApp.Stop (Seconds (stop_time));
 
   if (trace)
     {
-      std::cout << "trace" << std::endl;
       Simulator::Schedule (Seconds (0.00001), &cwnd, trace_file);
     }
-  std::cout << "trace end" << std::endl;
 
   if (pcap)
     {
@@ -185,7 +170,12 @@ int main (int argc, char *argv[])
        link.EnablePcapAll ("cwnd-trace", true);
     }
 
-  Simulator::Stop (Seconds (15));
+  for ( float i = start_time; i < stop_time ; i++)
+   {
+     GetSSStats(nodes.Get (0), Seconds(i), stack);
+   }
+
+  Simulator::Stop (Seconds (stop_time));
   Simulator::Run ();
   Simulator::Destroy ();
   return 0;
