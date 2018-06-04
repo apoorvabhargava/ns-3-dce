@@ -71,22 +71,21 @@ int main (int argc, char *argv[])
 {
   bool trace = true;
   bool pcap = false;
-  double simulation_time = 10.0;
   std::string trace_file = "cwnd_trace_file.trace";
   std::string stack = "linux";
   unsigned int num_flows = 3;
   std::string sock_factory = "ns3::TcpSocketFactory";
-  float duration = 30;
+  float duration = 100;
 
   CommandLine cmd;
   cmd.AddValue ("trace", "Enable trace", trace);
   cmd.AddValue ("pcap", "Enable PCAP", pcap);
-  cmd.AddValue ("time", "Simulation Duration", simulation_time);
+  cmd.AddValue ("duration", "Simulation Duration", duration);
   cmd.AddValue ("stack", "Network stack: either ns3 or Linux", stack);
   cmd.Parse (argc, argv);
 
   // Set the simulation start and stop time
-  float start_time = 10.1;
+  float start_time = 0.1;
   float stop_time = start_time + duration;
 
   if (stack != "ns3" && stack != "linux")
@@ -99,7 +98,7 @@ int main (int argc, char *argv[])
 
   PointToPointHelper link;
   link.SetDeviceAttribute ("DataRate", StringValue ("2Mbps"));
-  link.SetChannelAttribute ("Delay", StringValue ("0.01ms"));
+  link.SetChannelAttribute ("Delay", StringValue ("5ms"));
 
   NetDeviceContainer rightToRouterDevices, routerToLeftDevices;
   rightToRouterDevices = link.Install (nodes.Get (0), nodes.Get (1));
@@ -140,6 +139,14 @@ int main (int argc, char *argv[])
     {
       LinuxStackHelper::PopulateRoutingTables ();
       dceManager.Install (nodes);
+      linuxStack.SysctlSet (nodes.Get (0), ".net.ipv4.tcp_congestion_control", "dctcp");
+      linuxStack.SysctlSet (nodes.Get (2), ".net.ipv4.tcp_congestion_control", "dctcp");
+      
+      linuxStack.SysctlSet (nodes,   ".net.ipv4.conf.default.forwarding", "1"); 
+      linuxStack.SysctlSet (nodes, ".net.ipv4.tcp_window_scaling", "1");
+      linuxStack.SysctlSet (nodes, ".net.ipv4.tcp_dsack", "0");
+      linuxStack.SysctlSet (nodes, ".net.ipv4.tcp_fack", "0");
+      linuxStack.SysctlSet (nodes, ".net.ipv4.tcp_ecn", "1");
     }
 
   uint16_t port = 2000;
@@ -170,7 +177,7 @@ int main (int argc, char *argv[])
        link.EnablePcapAll ("cwnd-trace", true);
     }
 
-  for ( float i = start_time; i < stop_time ; i++)
+  for ( float i = start_time; i < stop_time ; i=i+0.1)
    {
      GetSSStats(nodes.Get (0), Seconds(i), stack);
    }
