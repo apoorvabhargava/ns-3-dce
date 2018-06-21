@@ -398,6 +398,14 @@ def build_dce_examples(module, bld):
                        target='bin/dce-trace',
                        source=['example/dce-trace.cc', 'example/ccnx/misc-tools.cc'])
 
+    module.add_example(needed = ['core', 'internet', 'dce', 'point-to-point', 'netanim', 'csma', 'mobility', 'applications'],
+                       target='bin/dce-trace-static-routing',
+                       source=['example/dce-trace-static-routing.cc', 'example/ccnx/misc-tools.cc'])
+
+    module.add_example(needed = ['core', 'internet', 'dce', 'point-to-point', 'netanim', 'csma', 'mobility', 'applications'],
+                       target='bin/dce-trace-full-dumbbell',
+                       source=['example/dce-trace-full-dumbbell.cc', 'example/ccnx/misc-tools.cc'])
+
     module.add_example(needed = ['core', 'internet', 'dce', 'point-to-point', 'netanim', 'csma', 'fd-net-device'], 
                        target='bin/dce-iperf-emulation',
                        source=['example/dce-iperf-emulation.cc', 'example/ccnx/misc-tools.cc'])
