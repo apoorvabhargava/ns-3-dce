@@ -477,7 +477,6 @@ int main (int argc, char *argv[])
   std::string dirToSave = "mkdir -p " + dir;
   system (dirToSave.c_str ());
   system ((dirToSave + "/pcap/").c_str ());
-  //system ((dirToSave + "/cwndTraces/").c_str ());
   system ((dirToSave + "/markTraces/").c_str ());
   system ((dirToSave + "/queueTraces/").c_str ());
   //system (("cp -R PlotScripts-gfc-dctcp/* " + dir + "/pcap/").c_str ());
@@ -533,31 +532,31 @@ int main (int argc, char *argv[])
 
   uint16_t port = 50000;
   //Install Sink applications on R1
-  for(int i=0; i<20; i++)
+  for(int i=0; i<S1.GetN ()+S3.GetN (); i++)
     {
       InstallPacketSink (R1.Get (0), port+i, sock_factory);
     }
 
   //Install bulksend on S1 and S3
-  for(int i=0; i<10; i++)
+  for(int i=0; i<S1.GetN (); i++)
     {
       InstallBulkSend (S1.Get (i), R1Int.GetAddress (0), port+i, sock_factory);
     }
 
   //Install BulkSend application on S3
-  for(int i=0; i<10; i++)
+  for(int i=0; i<S3.GetN (); i++)
     {
       InstallBulkSend (S3.Get (i), R1Int.GetAddress (0), port+i+10, sock_factory);
     }
 
   //Install Sink applications on R2
-  for (uint32_t i = 0; i < 20; i++)
+  for (uint32_t i = 0; i < R2.GetN (); i++)
     {
       InstallPacketSink (R2.Get (i), port, sock_factory);
     }
 
   //Install BulkSend application on S2 
-  for(int i=0; i<10; i++)
+  for(int i=0; i<S2.GetN (); i++)
     {
       InstallBulkSend (S2.Get (i), R2Int.GetAddress (i*2), port, sock_factory);
     }
