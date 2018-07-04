@@ -64,22 +64,16 @@ for i in sender_node_id:
   respective list.
   '''
   for column_name in data.columns:
-  	print column_name,inputFile
   	column_titles.append (column_name)
   	temp_list = data[column_name].tolist()
   	dict_of_lists.append (temp_list)
   
-  print column_titles
 
-  print dict_of_lists[0]
-  print dict_of_lists[1] 
   if(len(column_titles) == 0):
-  	print "Data file does not contain titles"
   	sys.exit (0)
   
   legends = [] 
   
-  #print legends
   
   '''
   Set labels and titles
@@ -87,15 +81,15 @@ for i in sender_node_id:
   plt.xlabel (xlabel)
   plt.ylabel (ylabel)
   plt.title (title)
-  
-  ax = plt.subplot(111)
+
+  ax = plt.subplot (111)
   
   '''
   Plot graph against 0th 
   column to every column.
   '''
   for k in xrange(0, len(column_titles), 2):
-  	ax.plot (dict_of_lists[k], dict_of_lists[k+1])
+  	ax.plot (dict_of_lists[k], dict_of_lists[k+1], color='magenta', linewidth=3)
   
   if (i >= 3 and i <= 12):
     legends.append ("S1-"+str(i-2))   
@@ -111,7 +105,7 @@ for i in sender_node_id:
   '''
   box = ax.get_position()
   ax.set_position([box.x0, box.y0, box.width * 0.80, box.height])
-  ax.legend(legends, loc=2, title=lTitle, bbox_to_anchor=(1, 0.5))
+  ax.legend(legends, loc=2, title=lTitle, bbox_to_anchor=(1, 1), frameon=False)
   
   '''
   Save the graph
