@@ -69,6 +69,7 @@ int main (int argc, char *argv[])
   CommandLine cmd;
   cmd.AddValue ("pcap", "Enable PCAP", pcap);
   cmd.AddValue ("stack", "Network stack: either ns3 or Linux", stack);
+  cmd.AddValue ("transport_prot", "Transport protocol to use: cubic, dctcp, reno", transport_prot);
   cmd.AddValue ("start_time", "Time to start the flows", start_time);
   cmd.AddValue ("duration", "Time to allow flows to run in seconds", duration);
   cmd.Parse (argc, argv);
