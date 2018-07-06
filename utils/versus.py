@@ -28,6 +28,9 @@ xlabel = "Time (sec)"
 ylabel = "Cwnd (Packets)"
 title = ""
 lTitle = ""
+my_dpi=100
+
+plt.figure(figsize=(800/my_dpi, 600/my_dpi), dpi=my_dpi)
 
 for i in sender_node_id:
   '''
@@ -83,7 +86,13 @@ for i in sender_node_id:
   plt.title (title)
 
   ax = plt.subplot (111)
-  
+  ax.set_ylim([0,200])
+  ax.set_xlim([13,20])
+  ax.spines['bottom'].set_linewidth(2)
+  ax.spines['left'].set_linewidth(2)
+  ax.spines['top'].set_linewidth(2)
+  ax.spines['right'].set_linewidth(2)
+
   '''
   Plot graph against 0th 
   column to every column.

@@ -13,13 +13,12 @@ if (not os.path.isdir("../results/cwnd_data")):
   os.system("mkdir ../results/cwnd_data")
 
 for i in sender_node_id:
-  os.system ("cat ../files-"+str(i)+"/var/log/*/stdout > "+"../ns-3-dce/results/cwnd_data/"+str(i))
-
-time = np.arange (float (start_time), float (end_time), interval)
+  os.system ("cat ../files-"+str(i)+"/var/log/*/stdout > "+"../results/cwnd_data/"+str(i))
 
 for i in sender_node_id:
+  time = np.arange (float (start_time), float (end_time), interval)
   cwnd_data = []
-  with open ("../ns-3-dce/results/cwnd_data/"+str(i)) as f:
+  with open ("../results/cwnd_data/"+str(i)) as f:
     for line in f:
       j = 0
       m = line.find ("cwnd")
@@ -38,6 +37,9 @@ for i in sender_node_id:
   f.close ()
   format_data_file = open ("../results/cwnd_data/"+str(i)+"_format.txt", "w+")
   print_val = min (len (cwnd_data), len (time))
-  for k in range(print_val):
-    format_data_file.write (str(time[k])+","+cwnd_data[k]+"\n")
+  pop_val = len (time) - print_val
+  for k in range(pop_val):
+    time = np.delete (time, 0)
+  for z in range(len (cwnd_data)):
+    format_data_file.write (str(time[z])+","+cwnd_data[z]+"\n")
   
