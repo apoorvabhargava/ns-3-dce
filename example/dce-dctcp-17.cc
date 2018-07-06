@@ -222,15 +222,15 @@ int main (int argc, char *argv[])
   receiverNodes.Add (R2);
 
   PointToPointHelper pointToPointSR;
-  pointToPointSR.SetDeviceAttribute ("DataRate", StringValue ("1Mbps"));
+  pointToPointSR.SetDeviceAttribute ("DataRate", StringValue ("1000Mbps"));
   pointToPointSR.SetChannelAttribute ("Delay", StringValue ("0.05ms"));
 
   PointToPointHelper pointToPointT;
-  pointToPointT.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
+  pointToPointT.SetDeviceAttribute ("DataRate", StringValue ("10000Mbps"));
   pointToPointT.SetChannelAttribute ("Delay", StringValue ("0.05ms"));
 
   PointToPointHelper pointToPointT1;
-  pointToPointT1.SetDeviceAttribute ("DataRate", StringValue ("10Mbps"));
+  pointToPointT1.SetDeviceAttribute ("DataRate", StringValue ("10000Mbps"));
   pointToPointT1.SetChannelAttribute ("Delay", StringValue ("0.05ms"));
 
   NetDeviceContainer T1ScorpDev, T2ScorpDev, S1T1Dev, S2T1Dev, S3T2Dev, R1T2Dev, R2T2Dev;
@@ -483,6 +483,7 @@ int main (int argc, char *argv[])
   Config::SetDefault ("ns3::RedQueueDisc::UseEcn", BooleanValue (useEcn));
   Config::SetDefault ("ns3::RedQueueDisc::ARED", BooleanValue (true));
   Config::SetDefault ("ns3::RedQueueDisc::Gentle", BooleanValue (true));
+  Config::SetDefault ("ns3::RedQueueDisc::UseHardDrop", BooleanValue (false));
  // Config::SetDefault ("ns3::RedQueueDisc::LinkBandwidth", DataRateValue (DataRate ("10Mbps")));
   Config::SetDefault ("ns3::RedQueueDisc::MeanPktSize", UintegerValue (1500));
  // Config::SetDefault ("ns3::RedQueueDisc::LinkDelay", TimeValue (MilliSeconds (0.05)));
@@ -563,10 +564,9 @@ int main (int argc, char *argv[])
 
   pointToPointSR.EnablePcapAll (dir + "pcap/N", true);
 
-
   for (int j=0; j<40; j++)
    {
-      for(float i = 0.1; i < stopTime ; i=i+0.1)
+      for(float i = 10.0; i < stopTime ; i=i+0.1)
         {
            GetSSStats(senderNodes.Get (j), Seconds(i), stack);
         }
