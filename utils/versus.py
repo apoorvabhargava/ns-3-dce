@@ -113,7 +113,7 @@ for i in sender_node_id:
   Set legends and title 
   '''
   box = ax.get_position()
-  ax.set_position([box.x0, box.y0, box.width * 0.80, box.height])
+  ax.set_position([box.x0, box.y0, box.width * 0.90, box.height * 1.05])
   ax.legend(legends, loc=2, title=lTitle, bbox_to_anchor=(1, 1), frameon=False)
   
   '''
