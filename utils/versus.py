@@ -84,6 +84,7 @@ for i in sender_node_id:
   plt.xlabel (xlabel)
   plt.ylabel (ylabel)
   plt.title (title)
+  plt.xticks(np.arange(13, 21, step=1))
 
   ax = plt.subplot (111)
   ax.set_ylim([0,200])
@@ -92,6 +93,7 @@ for i in sender_node_id:
   ax.spines['left'].set_linewidth(2)
   ax.spines['top'].set_linewidth(2)
   ax.spines['right'].set_linewidth(2)
+  ax.set_xticklabels(('3', '4', '5', '6', '7', '8', '9', '10', '11'))
 
   '''
   Plot graph against 0th 
