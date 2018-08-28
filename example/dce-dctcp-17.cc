@@ -479,7 +479,7 @@ int main (int argc, char *argv[])
   system ((dirToSave + "/pcap/").c_str ());
   system ((dirToSave + "/markTraces/").c_str ());
   system ((dirToSave + "/queueTraces/").c_str ());
-  //system (("cp -R PlotScripts-gfc-dctcp/* " + dir + "/pcap/").c_str ());
+  system (("cp -R PlotScripts-gfc-dctcp/* " + dir + "/pcap/").c_str ());
   Config::SetDefault ("ns3::RedQueueDisc::UseEcn", BooleanValue (useEcn));
   Config::SetDefault ("ns3::RedQueueDisc::ARED", BooleanValue (true));
   Config::SetDefault ("ns3::RedQueueDisc::Gentle", BooleanValue (true));
