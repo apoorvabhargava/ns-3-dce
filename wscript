@@ -397,6 +397,10 @@ def build_dce_examples(module, bld):
     module.add_example(needed = ['core', 'internet', 'dce', 'point-to-point', 'netanim', 'csma', 'fd-net-device'], 
                        target='bin/dce-iperf-emulation',
                        source=['example/dce-iperf-emulation.cc', 'example/ccnx/misc-tools.cc'])
+
+    module.add_example(needed = ['core', 'internet', 'dce', 'point-to-point', 'netanim', 'csma', 'flow-monitor'],
+                       target='bin/dce-gfc-dumbbell',
+                       source=['example/dce-gfc-dumbbell.cc', 'example/ccnx/misc-tools.cc'])
                        
     module.add_example(needed = ['core', 'network', 'internet', 'dce', 'point-to-point', 'csma', 'applications'],
                        target='bin/linear-udp-perf',
