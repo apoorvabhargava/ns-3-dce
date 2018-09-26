@@ -87,18 +87,18 @@ void InstallPacketSink (Ptr<Node> node, uint16_t port, std::string sock_factory)
 
 static void GetSSStats (Ptr<Node> node, Time at, std::string stack)
 {
-  if(stack == "linux")
-  {
-    DceApplicationHelper process;
-    ApplicationContainer apps;
-    process.SetBinary ("ss");
-    process.SetStackSize (1 << 20);
-    process.AddArgument ("-a");
-    process.AddArgument ("-e");
-    process.AddArgument ("-i");
-    apps.Add(process.Install (node));
-    apps.Start(at);
-  }
+  if (stack == "linux")
+    {
+      DceApplicationHelper process;
+      ApplicationContainer apps;
+      process.SetBinary ("ss");
+      process.SetStackSize (1 << 20);
+      process.AddArgument ("-a");
+      process.AddArgument ("-e");
+      process.AddArgument ("-i");
+      apps.Add (process.Install (node));
+      apps.Start (at);
+    }
 }
 
 int main (int argc, char *argv[])
@@ -113,7 +113,7 @@ int main (int argc, char *argv[])
   uint32_t dataSize = 1446;
   uint32_t delAckCount = 2;
 
-  //Enable checksum if linux and ns3 node communicate 
+  //Enable checksum if linux and ns3 node communicate
   GlobalValue::Bind ("ChecksumEnabled", BooleanValue (true));
 
   time_t rawtime;
@@ -121,9 +121,9 @@ int main (int argc, char *argv[])
   char buffer[80];
 
   time (&rawtime);
-  timeinfo = localtime(&rawtime);
+  timeinfo = localtime (&rawtime);
 
-  strftime(buffer,sizeof(buffer),"%d-%m-%Y-%I-%M-%S",timeinfo);
+  strftime (buffer,sizeof(buffer),"%d-%m-%Y-%I-%M-%S",timeinfo);
   std::string currentTime (buffer);
 
   CommandLine cmd;
@@ -145,17 +145,15 @@ int main (int argc, char *argv[])
 
   uv->SetStream (stream);
   queue_disc_type = std::string ("ns3::") + queue_disc_type;
-  if (stack=="ns3")
+  if (stack == "ns3")
     {
       transport_prot = std::string ("ns3::") + transport_prot;
     }
 
-  (stack=="ns3") ? (std::cout << transport_prot << std::endl) : (std::cout << linux_prot << std::endl);
-
   TypeId qdTid;
   NS_ABORT_MSG_UNLESS (TypeId::LookupByNameFailSafe (queue_disc_type, &qdTid), "TypeId " << queue_disc_type << " not found");
 
-  if (stack=="ns3")
+  if (stack == "ns3")
     {
       if (transport_prot.compare ("ns3::TcpWestwoodPlus") == 0)
         {
@@ -217,7 +215,7 @@ int main (int argc, char *argv[])
   LinuxStackHelper linuxStack;
   InternetStackHelper internetStack;
 
-  if (stack=="linux")
+  if (stack == "linux")
     {
       sock_factory = "ns3::LinuxTcpSocketFactory";
       dceManager.SetTaskManagerAttribute ("FiberManagerType", StringValue ("UcontextFiberManager"));
@@ -226,30 +224,40 @@ int main (int argc, char *argv[])
       linuxStack.Install (rightNodes);
       internetStack.Install (routers);
     }
-  else if (stack=="ns3")
+  else if (stack == "ns3")
     {
-      internetStack.InstallAll (); 
+      internetStack.InstallAll ();
     }
 
   Ipv4AddressHelper ipAddresses ("10.0.0.0", "255.255.255.0");
 
-  Ipv4InterfaceContainer r1r2IPAddress = ipAddresses.Assign (r1r2ND);        ipAddresses.NewNetwork ();
+  Ipv4InterfaceContainer r1r2IPAddress = ipAddresses.Assign (r1r2ND);
+  ipAddresses.NewNetwork ();
 
   std::vector <Ipv4InterfaceContainer> leftToRouterIPAddress;
-  leftToRouterIPAddress.push_back (ipAddresses.Assign (leftToRouter [0]));   ipAddresses.NewNetwork ();
-  leftToRouterIPAddress.push_back (ipAddresses.Assign (leftToRouter [1]));   ipAddresses.NewNetwork ();
-  leftToRouterIPAddress.push_back (ipAddresses.Assign (leftToRouter [2]));   ipAddresses.NewNetwork ();
-  leftToRouterIPAddress.push_back (ipAddresses.Assign (leftToRouter [3]));   ipAddresses.NewNetwork ();
-  leftToRouterIPAddress.push_back (ipAddresses.Assign (leftToRouter [4]));   ipAddresses.NewNetwork ();
+  leftToRouterIPAddress.push_back (ipAddresses.Assign (leftToRouter [0]));
+  ipAddresses.NewNetwork ();
+  leftToRouterIPAddress.push_back (ipAddresses.Assign (leftToRouter [1]));
+  ipAddresses.NewNetwork ();
+  leftToRouterIPAddress.push_back (ipAddresses.Assign (leftToRouter [2]));
+  ipAddresses.NewNetwork ();
+  leftToRouterIPAddress.push_back (ipAddresses.Assign (leftToRouter [3]));
+  ipAddresses.NewNetwork ();
+  leftToRouterIPAddress.push_back (ipAddresses.Assign (leftToRouter [4]));
+  ipAddresses.NewNetwork ();
 
   std::vector <Ipv4InterfaceContainer> routerToRightIPAddress;
-  routerToRightIPAddress.push_back (ipAddresses.Assign (routerToRight [0]));   ipAddresses.NewNetwork ();
-  routerToRightIPAddress.push_back (ipAddresses.Assign (routerToRight [1]));   ipAddresses.NewNetwork ();
-  routerToRightIPAddress.push_back (ipAddresses.Assign (routerToRight [2]));   ipAddresses.NewNetwork ();
-  routerToRightIPAddress.push_back (ipAddresses.Assign (routerToRight [3]));   ipAddresses.NewNetwork ();
+  routerToRightIPAddress.push_back (ipAddresses.Assign (routerToRight [0]));
+  ipAddresses.NewNetwork ();
+  routerToRightIPAddress.push_back (ipAddresses.Assign (routerToRight [1]));
+  ipAddresses.NewNetwork ();
+  routerToRightIPAddress.push_back (ipAddresses.Assign (routerToRight [2]));
+  ipAddresses.NewNetwork ();
+  routerToRightIPAddress.push_back (ipAddresses.Assign (routerToRight [3]));
+  ipAddresses.NewNetwork ();
   routerToRightIPAddress.push_back (ipAddresses.Assign (routerToRight [4]));
 
-  if (stack=="linux")
+  if (stack == "linux")
     {
       dceManager.Install (leftNodes);
       dceManager.Install (rightNodes);
@@ -262,7 +270,7 @@ int main (int argc, char *argv[])
       linuxStack.SysctlSet (rightNodes, ".net.ipv4.tcp_ecn", "1");
     }
 
-  if (stack=="linux")
+  if (stack == "linux")
     {
       //Static Routing
       Ptr<Ipv4> ipv4Router1 = routers.Get (0)->GetObject<Ipv4> ();
@@ -290,27 +298,27 @@ int main (int argc, char *argv[])
       std::ostringstream cmd_oss;
 
       //Default route for senders
-      for(uint32_t i=1; i<6; i = i+1)
+      for (uint32_t i = 1; i < 6; i = i + 1)
         {
-           cmd_oss.str ("");
-           cmd_oss << "route add default via " << (routers.Get (0)->GetObject<Ipv4> ())->GetAddress (i+1, 0).GetLocal () << " dev sim0";
-           LinuxStackHelper::RunIp (leftNodes.Get (i-1), Seconds (0.00001), cmd_oss.str ());
-           LinuxStackHelper::RunIp (leftNodes.Get (i-1), Seconds (0.00001), "link set sim0 up");
+          cmd_oss.str ("");
+          cmd_oss << "route add default via " << (routers.Get (0)->GetObject<Ipv4> ())->GetAddress (i + 1, 0).GetLocal () << " dev sim0";
+          LinuxStackHelper::RunIp (leftNodes.Get (i - 1), Seconds (0.00001), cmd_oss.str ());
+          LinuxStackHelper::RunIp (leftNodes.Get (i - 1), Seconds (0.00001), "link set sim0 up");
         }
 
       //Default route for receivers
-      for(uint32_t i=1; i<6; i = i+1)
+      for (uint32_t i = 1; i < 6; i = i + 1)
         {
-           cmd_oss.str ("");
-           cmd_oss << "route add default via " << (routers.Get (1)->GetObject<Ipv4> ())->GetAddress (i+1, 0).GetLocal () << " dev sim0";
-           LinuxStackHelper::RunIp (rightNodes.Get (i-1), Seconds (0.00001), cmd_oss.str ());
-           LinuxStackHelper::RunIp (rightNodes.Get (i-1), Seconds (0.00001), "link set sim0 up");
+          cmd_oss.str ("");
+          cmd_oss << "route add default via " << (routers.Get (1)->GetObject<Ipv4> ())->GetAddress (i + 1, 0).GetLocal () << " dev sim0";
+          LinuxStackHelper::RunIp (rightNodes.Get (i - 1), Seconds (0.00001), cmd_oss.str ());
+          LinuxStackHelper::RunIp (rightNodes.Get (i - 1), Seconds (0.00001), "link set sim0 up");
         }
     }
-  else if (stack=="ns3")
-      { 
-        Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
-      }
+  else if (stack == "ns3")
+    {
+      Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
+    }
 
   dir += (currentTime + "/");
   std::string dirToSave = "mkdir -p " + dir;
@@ -320,14 +328,14 @@ int main (int argc, char *argv[])
   system ((dirToSave + "/queueTraces/").c_str ());
   system (("cp -R PlotScripts-gfc-dumbbell/* " + dir + "/pcap/").c_str ());
 
-  if (stack=="ns3")
+  if (stack == "ns3")
     {
       Config::SetDefault ("ns3::TcpSocket::SndBufSize", UintegerValue (1 << 20));
       Config::SetDefault ("ns3::TcpSocket::RcvBufSize", UintegerValue (1 << 20));
       Config::SetDefault ("ns3::TcpSocket::InitialCwnd", UintegerValue (10));
       Config::SetDefault ("ns3::TcpSocket::DelAckCount", UintegerValue (delAckCount));
       Config::SetDefault ("ns3::TcpSocket::SegmentSize", UintegerValue (dataSize));
-      Config::SetDefault ("ns3::TcpSocketBase::UseEcn", BooleanValue (useEcn));    
+      Config::SetDefault ("ns3::TcpSocketBase::UseEcn", BooleanValue (useEcn));
     }
 
   Config::SetDefault ("ns3::FifoQueueDisc::UseEcn", BooleanValue (useEcn));
@@ -362,18 +370,15 @@ int main (int argc, char *argv[])
   InstallBulkSend (leftNodes.Get (3), routerToRightIPAddress [3].GetAddress (1), port, sock_factory);
   InstallBulkSend (leftNodes.Get (4), routerToRightIPAddress [4].GetAddress (1), port, sock_factory);
 
-//  GtkConfigStore gcs;
-//  gcs.ConfigureAttributes ();
-
-  if (stack=="linux")
+  if (stack == "linux")
     {
-      for (int j=0; j<leftNodes.GetN (); j++)
-       {
-          for(float i = 10.0; i <= stopTime ; i=i+0.05)
+      for (int j = 0; j < leftNodes.GetN (); j++)
+        {
+          for (float i = 10.0; i <= stopTime; i = i + 0.05)
             {
-               GetSSStats(leftNodes.Get (j), Seconds(i), stack);
+              GetSSStats (leftNodes.Get (j), Seconds (i), stack);
             }
-       }
+        }
     }
 
   pointToPointLeaf.EnablePcapAll (dir + "pcap/N", true);
@@ -393,7 +398,7 @@ int main (int argc, char *argv[])
   myfile << "queue_disc_type " << queue_disc_type << "\n";
   myfile << "stream  " << stream << "\n";
   myfile << "stack  " << stack << "\n";
-  (stack=="ns3") ? myfile << "transport_prot " << transport_prot << "\n" : myfile << "linux_prot " << linux_prot << "\n";
+  (stack == "ns3") ? myfile << "transport_prot " << transport_prot << "\n" : myfile << "linux_prot " << linux_prot << "\n";
   myfile << "dataSize " << dataSize << "\n";
   myfile << "delAckCount " << delAckCount << "\n";
   myfile << "stopTime " << stopTime << "\n";
