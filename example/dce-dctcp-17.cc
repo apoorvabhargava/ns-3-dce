@@ -15,8 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  *
- * Authors: Shikha Bakshi <shikhabakshi912@gmail.com>
- *          Apoorva Bhargava <apoorvabhargava13@gmail.com>
+ * Authors: Apoorva Bhargava <apoorvabhargava13@gmail.com>
  *          Mohit P. Tahiliani <tahiliani@nitk.edu.in>
  */
 
@@ -140,27 +139,6 @@ static void GetSSStats (Ptr<Node> node, Time at, std::string stack)
     apps.Add(process.Install (node));
     apps.Start(at);
   }
-}
-
-static void Forwarding(std::string string1, std::string string2)
-{
-  std::cout << "String 1:" << string1 << std::endl;
-  std::cout << "String 2:" << string2 << std::endl;
-}
-
-void TestStuff()
-{
-  std::cout << "Inside test stuff." << std::endl;
-  for(int i=0; i<40; i++)
-    {
-      LinuxStackHelper::SysctlGet (senderNodes.Get (0), Simulator::Now (), ".net.ipv4.conf.default.forwarding", &Forwarding);
-      LinuxStackHelper::SysctlGet (senderNodes.Get (0), Simulator::Now (), ".net.ipv4.tcp_congestion_control", &Forwarding);
-    }
-  for(int i=0; i<21; i++)
-    {
-      LinuxStackHelper::SysctlGet (receiverNodes.Get (0), Simulator::Now (), ".net.ipv4.conf.default.forwarding", &Forwarding);
-      LinuxStackHelper::SysctlGet (receiverNodes.Get (0), Simulator::Now (), ".net.ipv4.tcp_congestion_control", &Forwarding);
-    } 
 }
 
 int main (int argc, char *argv[])
@@ -371,14 +349,6 @@ int main (int argc, char *argv[])
       linuxStack.SysctlSet (R2, ".net.ipv4.tcp_ecn", "1");
     }
 
-  Simulator::Schedule(Seconds(3), &TestStuff);
-
-  std::ostringstream serverIp;
-  Ptr<Ipv4> routeraddress = T.Get (1)->GetObject<Ipv4> ();
-  Ipv4Address serverAddress = routeraddress->GetAddress (1, 0).GetLocal ();
-  serverAddress.Print (serverIp);
-  std::cout << "Ip Address:" << serverIp.str() << std::endl;
-
   Ptr<Ipv4> ipv4T1 = T.Get (0)->GetObject<Ipv4> ();
   Ptr<Ipv4> ipv4T2 = T.Get (1)->GetObject<Ipv4> ();
   Ptr<Ipv4> ipv4Scorp = Scorp.Get (0)->GetObject<Ipv4> ();
@@ -484,9 +454,7 @@ int main (int argc, char *argv[])
   Config::SetDefault ("ns3::RedQueueDisc::ARED", BooleanValue (true));
   Config::SetDefault ("ns3::RedQueueDisc::Gentle", BooleanValue (true));
   Config::SetDefault ("ns3::RedQueueDisc::UseHardDrop", BooleanValue (false));
- // Config::SetDefault ("ns3::RedQueueDisc::LinkBandwidth", DataRateValue (DataRate ("10Mbps")));
   Config::SetDefault ("ns3::RedQueueDisc::MeanPktSize", UintegerValue (1500));
- // Config::SetDefault ("ns3::RedQueueDisc::LinkDelay", TimeValue (MilliSeconds (0.05)));
   Config::SetDefault ("ns3::RedQueueDisc::MinTh", DoubleValue (50));
   Config::SetDefault ("ns3::RedQueueDisc::MaxTh", DoubleValue (50));
   Config::SetDefault ("ns3::RedQueueDisc::QW", DoubleValue (1));
@@ -526,10 +494,6 @@ int main (int argc, char *argv[])
   Config::Set ("/$ns3::NodeListPriv/NodeList/0/$ns3::Node/$ns3::TrafficControlLayer/RootQueueDiscList/0/$" + queue_disc_type + "/MaxSize", QueueSizeValue (QueueSize ("666p")));
   Config::Set ("/$ns3::NodeListPriv/NodeList/1/$ns3::Node/$ns3::TrafficControlLayer/RootQueueDiscList/1/$" + queue_disc_type + "/MaxSize", QueueSizeValue (QueueSize ("666p")));
   Config::Set ("/$ns3::NodeListPriv/NodeList/2/$ns3::Node/$ns3::TrafficControlLayer/RootQueueDiscList/1/$" + queue_disc_type + "/MaxSize", QueueSizeValue (QueueSize ("666p")));
-
-  Config::Set ("/$ns3::NodeListPriv/NodeList/0/$ns3::Node/$ns3::TrafficControlLayer/RootQueueDiscList/0/$ns3::RedQueueDisc/LinkBandwidth", DataRateValue (DataRate ("10Mbps")));
-  Config::Set ("/$ns3::NodeListPriv/NodeList/1/$ns3::Node/$ns3::TrafficControlLayer/RootQueueDiscList/1/$ns3::RedQueueDisc/LinkBandwidth", DataRateValue (DataRate ("1Mbps")));
-  Config::Set ("/$ns3::NodeListPriv/NodeList/2/$ns3::Node/$ns3::TrafficControlLayer/RootQueueDiscList/1/$ns3::RedQueueDisc/LinkBandwidth", DataRateValue (DataRate ("10Mbps")));
 
   uint16_t port = 50000;
   //Install Sink applications on R1
