@@ -174,23 +174,23 @@ cp overallTP.txt ../Graphs/
 cp gnuplotscriptQ ../
 
 cd ../queueTraces/
-echo "Queue 0" > QueueStatsAfter13sec.txt
+echo "Queue 0" > QueueStatsAfter3sec.txt
 drops=`awk '{if ($1 >= 13) print $0}' drop-0.plotme | wc -l`
 marks=`awk '{if ($1 >= 13) print $0}' mark-0.plotme | wc -l`
-echo -e  "$drops Drops, $marks Marks\n" >> QueueStatsAfter13sec.txt
+echo -e  "$drops Drops, $marks Marks\n" >> QueueStatsAfter3sec.txt
 
-echo "Queue 1" >> QueueStatsAfter13sec.txt
+echo "Queue 1" >> QueueStatsAfter3sec.txt
 drops=`awk '{if ($1 >= 13) print $0}' drop-1.plotme | wc -l`
 marks=`awk '{if ($1 >= 13) print $0}' mark-1.plotme | wc -l`
-echo -e  "$drops Drops, $marks Marks\n" >> QueueStatsAfter13sec.txt
+echo -e  "$drops Drops, $marks Marks\n" >> QueueStatsAfter3sec.txt
 
-echo "Queue 2" >> QueueStatsAfter13sec.txt
+echo "Queue 2" >> QueueStatsAfter3sec.txt
 drops=`awk '{if ($1 >= 13) print $0}' drop-2.plotme | wc -l`
 marks=`awk '{if ($1 >= 13) print $0}' mark-2.plotme | wc -l`
-echo -e  "$drops Drops, $marks Marks\n" >> QueueStatsAfter13sec.txt
+echo -e  "$drops Drops, $marks Marks\n" >> QueueStatsAfter3sec.txt
 
 
-cp QueueStatsAfter13sec.txt ../Graphs/
+cp QueueStatsAfter3sec.txt ../Graphs/
 
 cd ..
 
