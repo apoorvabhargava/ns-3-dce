@@ -116,41 +116,6 @@ void InstallPacketSink (Ptr<Node> node, uint16_t port, std::string sock_factory)
   sinkApps.Stop (Seconds (stopTime));
 }
 
-// Calculate drop probability at router T1
-void
-ProbChange0 (double oldP, double newP)
-{
-  std::ofstream fPlotQueue (dir + "ProbTraces/T1.plotme", std::ios::out | std::ios::app);
-  fPlotQueue << Simulator::Now ().GetSeconds () << " " << newP << std::endl;
-  fPlotQueue.close ();
-}
-
-// Calculate drop probability at router T2
-void
-ProbChange1 (double oldP, double newP)
-{
-  std::ofstream fPlotQueue (dir + "ProbTraces/T2.plotme", std::ios::out | std::ios::app);
-  fPlotQueue << Simulator::Now ().GetSeconds () << " " << newP << std::endl;
-  fPlotQueue.close ();
-}
-
-// Calculate drop probability at router Scorpion
-void
-ProbChange2 (double oldP, double newP)
-{
-  std::ofstream fPlotQueue (dir + "ProbTraces/Scorp.plotme", std::ios::out | std::ios::app);
-  fPlotQueue << Simulator::Now ().GetSeconds () << " " << newP << std::endl;
-  fPlotQueue.close ();
-}
-
-// Function to trace drop probabilty
-void
-TraceProb (uint32_t node, uint32_t probability,
-           Callback <void, double, double> ProbTrace)
-{
-  Config::ConnectWithoutContext ("$ns3::NodeListPriv/NodeList/" + std::to_string (node) + "/$ns3::TrafficControlLayer/RootQueueDiscList/" + std::to_string (probability) + "/$ns3::RedQueueDisc/Probability", ProbTrace);
-}
-
 // Install Bulk Send Application on the particular node and starts the application randomly between 10 to 11 seconds
 void InstallBulkSend (Ptr<Node> node, Ipv4Address address, uint16_t port, std::string sock_factory)
 {
@@ -485,7 +450,6 @@ int main (int argc, char *argv[])
   std::string dirToSave = "mkdir -p " + dir;
   system (dirToSave.c_str ());
   system ((dirToSave + "/pcap/").c_str ());
-  system ((dirToSave + "/ProbTraces/").c_str ());
   system ((dirToSave + "/markTraces/").c_str ());
   system ((dirToSave + "/queueTraces/").c_str ());
   system (("cp -R PlotScripts-gfc-dctcp/* " + dir + "/pcap/").c_str ());
@@ -513,7 +477,6 @@ int main (int argc, char *argv[])
   tch.Uninstall (T1ScorpDev);
   qd = tch.Install (T1ScorpDev);
   Simulator::ScheduleNow (&CheckQueueSize, qd.Get (0));
-  Simulator::Schedule (Seconds (2.0), &TraceProb, 0, 0, MakeCallback (&ProbChange0));
   streamWrapper = asciiTraceHelper.CreateFileStream (dir + "/queueTraces/drop-0.plotme");
   qd.Get (0)->TraceConnectWithoutContext ("Drop", MakeBoundCallback (&DropAtQueue, streamWrapper));
   streamWrapper = asciiTraceHelper.CreateFileStream (dir + "/queueTraces/mark-0.plotme");
@@ -523,7 +486,6 @@ int main (int argc, char *argv[])
   tch.Uninstall (T2ScorpDev);
   qd1 = tch.Install (T2ScorpDev);
   Simulator::ScheduleNow (&CheckQueueSize1, qd1.Get (0));
-  Simulator::Schedule (Seconds (2.0), &TraceProb, 2, 1, MakeCallback (&ProbChange2));
   streamWrapper = asciiTraceHelper.CreateFileStream (dir + "/queueTraces/drop-1.plotme");
   qd1.Get (0)->TraceConnectWithoutContext ("Drop", MakeBoundCallback (&DropAtQueue, streamWrapper));
   streamWrapper = asciiTraceHelper.CreateFileStream (dir + "/queueTraces/mark-1.plotme");
@@ -533,7 +495,6 @@ int main (int argc, char *argv[])
   tch.Uninstall (R1T2Dev.Get (1));
   qd2 = tch.Install (R1T2Dev.Get (1));
   Simulator::ScheduleNow (&CheckQueueSize2, qd2.Get (0));
-  Simulator::Schedule (Seconds (2.0), &TraceProb, 1, 1, MakeCallback (&ProbChange1));
   streamWrapper = asciiTraceHelper.CreateFileStream (dir + "/queueTraces/drop-2.plotme");
   qd2.Get (0)->TraceConnectWithoutContext ("Drop", MakeBoundCallback (&DropAtQueue, streamWrapper));
   streamWrapper = asciiTraceHelper.CreateFileStream (dir + "/queueTraces/mark-2.plotme");

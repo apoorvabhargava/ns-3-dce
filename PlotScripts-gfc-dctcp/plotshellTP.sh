@@ -173,7 +173,6 @@ cp overallTP.txt ../Graphs/
 
 # Copy scripts to plot queue and drop probability graphs
 cp gnuplotscriptQ ../
-cp gnuplotscriptProb ../ProbTraces/
 
 # Get queue statistics after 3 seconds
 cd ../queueTraces/
@@ -204,14 +203,7 @@ gnuplot gnuplotscriptQ
 cp queue-*.png Graphs/
 cp queueStats.txt Graphs/
 
-# Plot drop probability graphs and copy them Graphs folder
-cd ProbTraces
-awk  '{$1 = $1-10}1' OFS=' ' T1.plotme  > T1_1.plotme
-awk  '{$1 = $1-10}1' OFS=' ' T2.plotme  > T2_1.plotme
-gnuplot gnuplotscriptProb
-cp *.png ../Graphs/
-
 # Plot cwnd graphs 
-cd ../../../../utils
+cd ../../../utils
 python parse_cwnd.py 10 20 0.1
 python versus.py

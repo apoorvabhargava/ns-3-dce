@@ -1,5 +1,5 @@
 set xrange [3:10]
-set yrange [0:1200]
+set yrange [0:700]
 set terminal pngcairo enhanced color lw 2 size 800,600 font 'Arial-Bold'
 set output "ProportionalFairshare-S1-1.png"
 set xlabel "Time (sec)" font "Verdana"
